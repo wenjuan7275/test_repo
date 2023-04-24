@@ -1,0 +1,73 @@
+# general settings
+name: test_ART_SR_x4
+model_type: ARTModel
+scale: 4
+num_gpu: 1
+manual_seed: 10
+
+datasets:
+  test_1:  # the 1st test dataset
+    name: CAMO
+    type: PairedImageDataset
+    dataroot_gt: /cluster/work/cvl/juawen/dataset/CAMO/Camouflage/Images/Test_mod
+    dataroot_lq: /cluster/work/cvl/juawen/dataset/CAMO/Camouflage/Images/LR_bicubic/X4
+    filename_tmpl: '{}x4'
+    io_backend:
+      type: disk
+
+  test_2:  # the 2nd test dataset
+    name: COD10K-v3
+    type: PairedImageDataset
+    dataroot_gt: /cluster/work/cvl/juawen/dataset/COD10K-v3/Test/Image_mod
+    dataroot_lq: /cluster/work/cvl/juawen/dataset/COD10K-v3/Test/LR_bicubic/X4
+    filename_tmpl: '{}x4'
+    io_backend:
+      type: disk
+
+  test_3:  # the 3rd test dataset
+    name: NC4K
+    type: PairedImageDataset
+    dataroot_gt: /cluster/work/cvl/juawen/dataset/NC4K/Imgs_mod
+    dataroot_lq: /cluster/work/cvl/juawen/dataset/NC4K/LR_bicubic/X4
+    filename_tmpl: '{}x4'
+    io_backend:
+      type: disk
+
+
+
+
+# network structures
+network_g:
+  type: ART
+  upscale: 4
+  in_chans: 3
+  img_size: 64
+  window_size: 8
+  img_range: 1.
+  depths: [6, 6, 6, 6, 6, 6]
+  interval: [4, 4, 4, 4, 4, 4]
+  embed_dim: 180
+  num_heads: [6, 6, 6, 6, 6, 6]
+  mlp_ratio: 4
+  upsampler: 'pixelshuffle'
+  resi_connection: '1conv'
+
+# path
+path:
+  pretrain_network_g: experiments/pretrained_models/SR_ART_x4.pth
+  strict_load_g: true
+
+# validation settings
+val:
+  save_img: true
+  suffix: ~  # add suffix to saved images, if None, use exp name
+
+  metrics:
+    psnr: # metric name, can be arbitrary
+      type: calculate_psnr
+      crop_border: 4
+      test_y_channel: true
+    ssim:
+      type: calculate_ssim
+      crop_border: 4
+      test_y_channel: true
